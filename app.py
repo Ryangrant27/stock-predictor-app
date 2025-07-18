@@ -35,7 +35,7 @@ if st.button("Fetch & Predict Bitcoin Price"):
 # 2. Bitcoin News + Sentiment
 st.header("📰 Latest Bitcoin News & Internet Sentiment")
 
-NEWS_API_KEY = "YOUR_NEWSAPI_KEY"  # <-- replace with your key from https://newsapi.org
+NEWS_API_KEY = "78d8661731a840e3baddda94e3f3c90e"  # <-- replace with your key from https://newsapi.org
 
 def get_bitcoin_news(api_key):
     url = f"https://newsapi.org/v2/everything?q=bitcoin&sortBy=publishedAt&language=en&pageSize=5&apiKey={api_key}"
