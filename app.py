@@ -24,10 +24,8 @@ if st.button("Fetch & Predict Bitcoin Price"):
     elif 'Close' not in data.columns:
         st.warning("No 'Close' column found in data! Something is wrong with the returned DataFrame.")
     else:
-        close_notna_sum = data['Close'].notna().sum()
-        st.write("Debug: Notna sum for 'Close':", close_notna_sum, type(close_notna_sum))
-        # If close_notna_sum is not an integer, something is very wrong. Let's force it to int:
-        close_notna_sum = int(close_notna_sum)
+        close_notna_sum = int(data['Close'].notna().sum())
+        st.write("Debug: Notna sum for 'Close':", close_notna_sum)
         if close_notna_sum <= 2:
             st.warning("Not enough valid closing price data in this range. Try a wider or different date range.")
         else:
@@ -38,7 +36,9 @@ if st.button("Fetch & Predict Bitcoin Price"):
             df = df[[date_col, 'Close']].copy()
             df.rename(columns={date_col: 'ds', 'Close': 'y'}, inplace=True)
             df['ds'] = pd.to_datetime(df['ds'])
-            df = df.dropna()
+            df['y'] = pd.to_numeric(df['y'], errors='coerce')   # Ensure y is numeric
+            df = df.dropna(subset=['ds', 'y'])                  # Drop rows where ds or y is NaN
+            st.write("Debug: Prophet input df", df.head(), df.dtypes)  # Show the actual data and types
             model = Prophet(daily_seasonality=True)
             with st.spinner("Training prediction model..."):
                 model.fit(df)
