@@ -22,7 +22,7 @@ if st.button("Fetch & Predict Bitcoin Price"):
         model = Prophet(daily_seasonality=True)
         with st.spinner("Training prediction model..."):
             model.fit(df)
-            future = model.make_future_dataframe(periods=90)  # 3 months
+            future = model.make_future_dataframe(periods=90)  # 3 months (90 days)  # 3 months
             forecast = model.predict(future)
         st.subheader("Forecast (Next 3 Months)")
         forecast_chart = forecast[['ds', 'yhat']].set_index('ds').tail(90)
