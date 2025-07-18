@@ -17,6 +17,10 @@ future_days = st.slider("How many days into the future to predict?", 30, 365, 90
 
 if st.button("Fetch & Predict Bitcoin Price"):
     data = yf.download('BTC-USD', start=start, end=end)
+    # Debugging info
+    st.write("Debug: BTC-USD data (first 5 rows):")
+    st.write(data.head())
+    st.write("Debug: Number of rows:", data.shape[0])
     if not data.empty and data['Close'].notna().sum() > 2:
         st.subheader("Historical Bitcoin Prices")
         st.line_chart(data['Close'])
@@ -33,5 +37,4 @@ if st.button("Fetch & Predict Bitcoin Price"):
         st.write("Forecast Data (Last 10 Days):")
         st.dataframe(forecast[['ds', 'yhat']].tail(10))
     else:
-        st.warning("No data found for Bitcoin for these dates. Please select a valid date range.")
-
+        st.warning("No data found for Bitcoin in this date range. Try a wider or older date range. If this keeps happening, yfinance may be rate-limited or blocked on Streamlit Cloud.")
