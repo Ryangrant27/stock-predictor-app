@@ -3,3 +3,5 @@ yfinance
 prophet
 pandas
 matplotlib
+requests
+textblob
