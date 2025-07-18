@@ -24,8 +24,15 @@ if st.button("Fetch & Predict Bitcoin Price"):
     if not data.empty and data['Close'].notna().sum() > 2:
         st.subheader("Historical Bitcoin Prices")
         st.line_chart(data['Close'])
-        df = data.reset_index()[['Date', 'Close']]
-        df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
+        df = data.reset_index()
+        # Sometimes the date column is named 'Date', sometimes 'Datetime'
+        date_col = 'Date' if 'Date' in df.columns else 'Datetime' if 'Datetime' in df.columns else df.columns[0]
+        df = df[[date_col, 'Close']].copy()
+        df.rename(columns={date_col: 'ds', 'Close': 'y'}, inplace=True)
+        # Make sure 'ds' is datetime
+        df['ds'] = pd.to_datetime(df['ds'])
+        df = df.dropna()  # Remove rows with missing values
+
         model = Prophet(daily_seasonality=True)
         with st.spinner("Training prediction model..."):
             model.fit(df)
