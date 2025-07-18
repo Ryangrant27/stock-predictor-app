@@ -27,10 +27,9 @@ if st.button("Fetch & Predict Bitcoin Price"):
             st.warning("No 'Close' column found in data! Something is wrong with the returned DataFrame.")
         else:
 
-            if (
-                data['Close'].notna().sum() <= 2
-                ):
+            if data['Close'].notna().sum() <= 2:
                 st.warning("Not enough valid closing price data in this range. Try a wider or different date range.")
+
 
             else:
                 st.subheader("Historical Bitcoin Prices")
