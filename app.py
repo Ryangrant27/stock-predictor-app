@@ -31,14 +31,30 @@ if st.button("Fetch & Predict Bitcoin Price"):
         else:
             st.subheader("Historical Bitcoin Prices")
             st.line_chart(data['Close'])
+
+            # ----- THIS IS THE FIXED BLOCK -----
             df = data.reset_index()
             date_col = 'Date' if 'Date' in df.columns else 'Datetime' if 'Datetime' in df.columns else df.columns[0]
             df = df[[date_col, 'Close']].copy()
             df.rename(columns={date_col: 'ds', 'Close': 'y'}, inplace=True)
             df['ds'] = pd.to_datetime(df['ds'])
-            df['y'] = pd.to_numeric(df['y'], errors='coerce')   # Ensure y is numeric
-            df = df.dropna(subset=['ds', 'y'])                  # Drop rows where ds or y is NaN
-            st.write("Debug: Prophet input df", df.head(), df.dtypes)  # Show the actual data and types
+
+            # Debug output to trace the issue!
+            st.write("Debug: Before fixing, df.columns:", df.columns)
+            st.write("Debug: Before fixing, df['y'] type:", type(df['y']))
+            st.write("Debug: Before fixing, df.head():", df.head())
+
+            # Ensure 'y' is a Series and numeric
+            if isinstance(df['y'], pd.DataFrame):
+                df['y'] = df['y'].squeeze()
+            df['y'] = pd.to_numeric(df['y'], errors='coerce')
+
+            df = df.dropna(subset=['ds', 'y'])
+
+            st.write("Debug: After fixing, df['y'] type:", type(df['y']))
+            st.write("Debug: Prophet input df", df.head(), df.dtypes)
+            # ----- END OF FIXED BLOCK -----
+
             model = Prophet(daily_seasonality=True)
             with st.spinner("Training prediction model..."):
                 model.fit(df)
