@@ -18,19 +18,17 @@ if st.button("Fetch & Predict Bitcoin Price"):
     st.write("Debug: BTC-USD data (first 5 rows):")
     st.write(data.head())
     st.write("Debug: Number of rows:", data.shape[0])
+    st.write("Debug: Columns in data:", data.columns)
 
-    # ALL checks INSIDE the button block
     if data.empty:
         st.warning("No data was returned from yfinance. Try a wider or different date range.")
     else:
         if 'Close' not in data.columns:
             st.warning("No 'Close' column found in data! Something is wrong with the returned DataFrame.")
         else:
-
+            st.write("Debug: Notna sum for 'Close':", data['Close'].notna().sum())
             if data['Close'].notna().sum() <= 2:
                 st.warning("Not enough valid closing price data in this range. Try a wider or different date range.")
-
-
             else:
                 st.subheader("Historical Bitcoin Prices")
                 st.line_chart(data['Close'])
