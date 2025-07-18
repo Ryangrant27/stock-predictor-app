@@ -17,22 +17,25 @@ future_days = st.slider("How many days into the future to predict?", 30, 365, 90
 
 if st.button("Fetch & Predict Bitcoin Price"):
     data = yf.download('BTC-USD', start=start, end=end)
-    # Debugging info
     st.write("Debug: BTC-USD data (first 5 rows):")
     st.write(data.head())
     st.write("Debug: Number of rows:", data.shape[0])
-    if not data.empty and data['Close'].notna().sum() > 2:
+    # Bulletproof error handling:
+    if data.empty:
+        st.warning("No data was returned from yfinance. Try a wider or different date range.")
+    elif 'Close' not in data.columns:
+        st.warning("No 'Close' column found in data! Something is wrong with the returned DataFrame.")
+    elif data['Close'].notna().sum() <= 2:
+        st.warning("Not enough valid closing price data in this range. Try a wider or different date range.")
+    else:
         st.subheader("Historical Bitcoin Prices")
         st.line_chart(data['Close'])
         df = data.reset_index()
-        # Sometimes the date column is named 'Date', sometimes 'Datetime'
         date_col = 'Date' if 'Date' in df.columns else 'Datetime' if 'Datetime' in df.columns else df.columns[0]
         df = df[[date_col, 'Close']].copy()
         df.rename(columns={date_col: 'ds', 'Close': 'y'}, inplace=True)
-        # Make sure 'ds' is datetime
         df['ds'] = pd.to_datetime(df['ds'])
-        df = df.dropna()  # Remove rows with missing values
-
+        df = df.dropna()
         model = Prophet(daily_seasonality=True)
         with st.spinner("Training prediction model..."):
             model.fit(df)
@@ -43,5 +46,3 @@ if st.button("Fetch & Predict Bitcoin Price"):
         st.line_chart(forecast_chart)
         st.write("Forecast Data (Last 10 Days):")
         st.dataframe(forecast[['ds', 'yhat']].tail(10))
-    else:
-        st.warning("No data found for Bitcoin in this date range. Try a wider or older date range. If this keeps happening, yfinance may be rate-limited or blocked on Streamlit Cloud.")
