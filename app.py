@@ -2,7 +2,11 @@ import streamlit as st
 import yfinance as yf
 from prophet import Prophet
 import pandas as pd
-from datetime import datetime
+from datetime import date
+
+start = st.date_input("Start date", datetime(2018, 1, 1))
+today = date.today()
+end = st.date_input("End date", today, max_value=today)
 
 st.set_page_config(page_title="Bitcoin Predictor", layout="centered")
 st.title("🪙 Bitcoin Future Predictor")
